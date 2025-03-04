@@ -2,14 +2,16 @@
 	"schemaVersion": 1,
 	"id": "rstamina",
 	"version": "${version}",
-	"name": "Realistic Stamina",
-	"description": "Adds a realistic stamina and energy system.",
+	"name": "Realistic Stamina - Extended",
+	"description": "An enhanced version of the Realistic Stamina mod by sparkierkan7. Adds configurable jump stamina costs, mining fatigue cooldown, and other improvements to the original stamina system.",
 	"authors": [
-		"sparkierkan7"
+		"Bradderz65 (Modified version)",
+		"sparkierkan7 (Original author)"
 	],
 	"contact": {
-		"homepage": "https://modrinth.com/mod/realistic-stamina",
-		"sources": "https://github.com/Sparkierkan7/realistic_stamina_mod"
+		"homepage": "https://github.com/Bradderz65/realistic-stamina-mod",
+		"sources": "https://github.com/Bradderz65/realistic-stamina-mod",
+		"issues": "https://github.com/Bradderz65/realistic-stamina-mod/issues"
 	},
 	"license": "MIT",
 	"icon": "assets/rstamina/copper_clock.png",
