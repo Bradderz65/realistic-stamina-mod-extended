@@ -7,26 +7,21 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import realisticstamina.rstamina.RStaminaClient;
 import realisticstamina.rstamina.RStaminaMod;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 public class StaminaHudOverlay implements HudRenderCallback {
 
-
-
     @Override
     public void onHudRender(DrawContext drawContext, float tickDelta) {
-
-        //RStaminaMod.LOGGER.info("renderkajsd;flakjsdf");
-
         int x = RStaminaMod.config.hudX;
         int y = RStaminaMod.config.hudY;
 
         MinecraftClient client = MinecraftClient.getInstance();
 
-        //RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        //RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
-        //RenderSystem.setShaderTexture(0, )
-
         if (client != null && RStaminaClient.showingStaminaTicks > 0) {
+            float alpha = RStaminaClient.showingStaminaTicks / 20.0f;
+            RenderSystem.enableBlend();
+            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
 
             TextRenderer textRenderer = client.textRenderer;
 
@@ -44,9 +39,18 @@ public class StaminaHudOverlay implements HudRenderCallback {
 
             drawContext.drawTextWithShadow(textRenderer, Text.literal("§eEnergy: §f" + ((float)RStaminaClient.clientStoredEnergy) + "%"), x, y + 10, 16777215);
 
+            // Only display speed multiplier when showSpeedMultiplierTicks is active
+            if (RStaminaClient.showSpeedMultiplierTicks > 0) {
+                // Calculate alpha for speed display based on remaining time
+                float speedAlpha = Math.min(1.0f, RStaminaClient.showSpeedMultiplierTicks / 20.0f);
+                
+                RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, speedAlpha);
+                String speedText = String.format("§bSpeed: §f%.1fx", RStaminaClient.clientStoredSpeedMultiplier);
+                drawContext.drawTextWithShadow(textRenderer, Text.literal(speedText), x, y + 20, 16777215);
+            }
+
+            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+            RenderSystem.disableBlend();
         }
-
-
-
     }
 }

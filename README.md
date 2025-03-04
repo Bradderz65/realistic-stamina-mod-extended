@@ -9,7 +9,14 @@ This extended version adds the following features to the original mod:
 - Configurable mining fatigue cooldown
 - Improved jump detection logic
 - Added mining fatigue effect
+- Speed multiplier system that links max stamina to sprint speed
 - Various optimizations and improvements
+
+### Speed Multiplier System
+- Players with higher max stamina can sprint faster (up to 2x speed at max stamina)
+- Speed increases gradually as max stamina increases through the fitness system
+- Use the `/showspeed` command to see your current speed multiplier for 30 seconds
+- Can be disabled in the configuration if desired
 
 ## Credits
 - Original mod by [sparkierkan7](https://modrinth.com/user/sparkierkan7)
@@ -36,6 +43,16 @@ The mod includes all original configuration options plus new settings for:
 - Jump stamina cost
 - Mining fatigue cooldown time
 - Mining fatigue effect settings
+- Speed multiplier settings:
+  - `maxSpeedMultiplier`: Maximum speed multiplier at max stamina (default: 2.0)
+  - `enableSpeedMultiplier`: Enable/disable the speed multiplier feature (default: true)
+
+## Commands
+- `/showspeed`: Shows your current speed multiplier for 30 seconds (available to all players)
+- `/setTotalStamina <value> <player>`: Sets a player's total stamina (requires op)
+- `/resetStaminaStats <player>`: Resets a player's stamina stats (requires op)
+- `/setStaminaLossRate <value> <player>`: Sets a player's stamina loss rate (requires op)
+- `/setStaminaGainRate <value> <player>`: Sets a player's stamina gain rate (requires op)
 
 ## Links
 - [Original Mod on Modrinth](https://modrinth.com/mod/realistic-stamina)

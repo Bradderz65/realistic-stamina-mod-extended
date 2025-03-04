@@ -14,6 +14,11 @@ public class RStaminaPlayerState {
 
     public int staminaRegenCooldown = 0;
     public int miningFatigueCooldown = 0;  // Cooldown before removing mining fatigue effect
+    public int exhaustionRestTimer = 0;     // Timer for required rest when exhausted
+    public boolean isExhausted = false;     // Whether player is in exhaustion state
+
+    // Speed multiplier based on max stamina
+    public double speedMultiplier = 1.0;
 
     //rates
     public double staminaLossRate = RStaminaMod.config.staminaLossRate;

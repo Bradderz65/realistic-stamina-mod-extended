@@ -46,8 +46,23 @@ public class RStaminaConfig extends Config {
     public double blockBreakStaminaCost = 2.0;
     @ConfigEntry(comment = "Amount of stamina you lose when jumping. (Default: 3.0)")
     public double jumpStaminaCost = 3.0;
-    @ConfigEntry(comment = "How long (in ticks) mining fatigue persists after stamina recovers above threshold. 20 ticks = 1 second (Default: 60)")
-    public int miningFatigueCooldownTicks = 60;
+    @ConfigEntry(comment = "How long (in ticks) mining fatigue persists after stamina recovers above threshold. 20 ticks = 1 second (Default: 100)")
+    public int miningFatigueCooldownTicks = 100;
+
+    @ConfigEntry(comment = "Stamina threshold below which exhaustion can occur. (Default: 5.0)")
+    public double exhaustionThreshold = 5.0;
+
+    @ConfigEntry(comment = "How long (in ticks) player must rest to recover from exhaustion. 20 ticks = 1 second (Default: 60)")
+    public int exhaustionRecoveryTicks = 60;
+
+    @ConfigEntry(comment = "Whether to show a warning message when player becomes exhausted. (Default: true)")
+    public boolean showExhaustionWarning = true;
+
+    @ConfigEntry(comment = "Maximum speed multiplier at max stamina level. Higher stamina gives faster sprint speed. (Default: 2.0)")
+    public double maxSpeedMultiplier = 2.0;
+    
+    @ConfigEntry(comment = "Enable or disable the speed multiplier feature. When disabled, stamina will not affect sprint speed. (Default: true)")
+    public boolean enableSpeedMultiplier = true;
 
     public RStaminaConfig() {
         super(ConfigOptions.mod(RStaminaMod.modid));

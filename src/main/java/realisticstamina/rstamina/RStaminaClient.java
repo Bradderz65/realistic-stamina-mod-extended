@@ -24,8 +24,11 @@ public class RStaminaClient implements ClientModInitializer {
     public static double clientStoredMaxStamina = 551.0;
     public static double clientStoredEnergy = 10.0;
     public static double clientStoredTotalStamina = 112.0;
+    public static double clientStoredSpeedMultiplier = 1.0;
 
     public static int showingStaminaTicks = 0;
+    // Timer for showing speed multiplier (in ticks, 20 ticks = 1 second)
+    public static int showSpeedMultiplierTicks = 0;
 
     @Override
     public void onInitializeClient() {
@@ -51,6 +54,11 @@ public class RStaminaClient implements ClientModInitializer {
                                 showingStaminaTicks -= 1;
                             }
 
+                            // Decrement speed multiplier display timer if active
+                            if (showSpeedMultiplierTicks > 0) {
+                                showSpeedMultiplierTicks -= 1;
+                            }
+
                             ClientPlayNetworking.send(NetworkingPackets.UPDATE_STAMINA_C2S_PACKET_ID, PacketByteBufs.create());
                             if (client.player.getVehicle() != null) {
                                 PacketByteBuf buf = PacketByteBufs.create();
@@ -65,6 +73,11 @@ public class RStaminaClient implements ClientModInitializer {
                             showingStaminaTicks = 20;
                         } else if (clientStoredStamina == clientStoredMaxStamina && showingStaminaTicks > 0) {
                             showingStaminaTicks -= 1;
+                        }
+
+                        // Decrement speed multiplier display timer if active
+                        if (showSpeedMultiplierTicks > 0) {
+                            showSpeedMultiplierTicks -= 1;
                         }
 
                         ClientPlayNetworking.send(NetworkingPackets.UPDATE_STAMINA_C2S_PACKET_ID, PacketByteBufs.create());

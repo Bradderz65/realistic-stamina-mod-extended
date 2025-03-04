@@ -9,11 +9,15 @@ import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
@@ -29,7 +33,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 public class RStaminaMod implements ModInitializer {
 
-	public static final String rStaminaModVersion = "1.4.1.3";
+	public static final String rStaminaModVersion = "1.4.2.0";
 	public static final String modid = "rstamina";
 	public static final Logger LOGGER = LoggerFactory.getLogger(modid);
 
@@ -191,6 +195,40 @@ public class RStaminaMod implements ModInitializer {
 
 									return 1;
 								})))));
+
+		// Register showspeed command (available to all players)
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(literal("showspeed")
+				.executes(context -> {
+					ServerPlayerEntity player = context.getSource().getPlayer();
+					if (player != null) {
+						// Check if speed multiplier feature is enabled
+						if (RStaminaMod.config.enableSpeedMultiplier) {
+							// Get the player's state
+							RStaminaPlayerState playerState = ServerState.getPlayerState(player);
+							
+							// Calculate speed multiplier based on max stamina
+							double baseStamina = RStaminaMod.config.totalStamina;
+							double maxStamina = RStaminaMod.config.fitnessStaminaLimit;
+							double currentTotalStamina = playerState.totalStamina;
+							
+							// Calculate a multiplier between 1.0 and maxSpeedMultiplier based on stamina
+							double staminaProgress = Math.min(1.0, Math.max(0.0, (currentTotalStamina - baseStamina) / (maxStamina - baseStamina)));
+							double speedMultiplier = 1.0 + (staminaProgress * (RStaminaMod.config.maxSpeedMultiplier - 1.0));
+							
+							// Send a message to the player
+							player.sendMessage(Text.literal(String.format("§bCurrent speed multiplier: §f%.2fx", speedMultiplier)), false);
+							
+							// Send a packet to the client to show the speed multiplier for 30 seconds (600 ticks)
+							PacketByteBuf sendingData = PacketByteBufs.create();
+							sendingData.writeInt(600); // 30 seconds * 20 ticks per second
+							ServerPlayNetworking.send(player, NetworkingPackets.SEND_SHOW_SPEED_S2C_PACKET_ID, sendingData);
+						} else {
+							// Send a message to the player that the feature is disabled
+							player.sendMessage(Text.literal("§cSpeed multiplier feature is disabled in the configuration."), false);
+						}
+					}
+					return 1;
+				})));
 
 		//setStaminaGainRate
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(literal("setStaminaGainRate").requires(source -> source.hasPermissionLevel(4))

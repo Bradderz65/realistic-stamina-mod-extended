@@ -34,6 +34,8 @@ public class ServerState extends PersistentState {
             playerStateNbt.putBoolean("edited", playerSate.edited);
             playerStateNbt.putInt("staminaRegenCooldown", playerSate.staminaRegenCooldown);
             playerStateNbt.putInt("miningFatigueCooldown", playerSate.miningFatigueCooldown);
+            playerStateNbt.putInt("exhaustionRestTimer", playerSate.exhaustionRestTimer);
+            playerStateNbt.putBoolean("isExhausted", playerSate.isExhausted);
             playerStateNbt.putDouble("staminaLossRate", playerSate.staminaLossRate);
             playerStateNbt.putDouble("staminaGainRate", playerSate.staminaGainRate);
             playerStateNbt.putDouble("energyLossRate", playerSate.energyLossRate);
@@ -67,6 +69,8 @@ public class ServerState extends PersistentState {
             playerState.edited = playersTag.getCompound(key).getBoolean("edited");
             playerState.staminaRegenCooldown = playersTag.getCompound(key).getInt("staminaRegenCooldown");
             playerState.miningFatigueCooldown = playersTag.getCompound(key).getInt("miningFatigueCooldown");
+            playerState.exhaustionRestTimer = playersTag.getCompound(key).getInt("exhaustionRestTimer");
+            playerState.isExhausted = playersTag.getCompound(key).getBoolean("isExhausted");
             playerState.staminaLossRate = playersTag.getCompound(key).getDouble("staminaLossRate");
             playerState.staminaGainRate = playersTag.getCompound(key).getDouble("staminaGainRate");
             playerState.energyLossRate = playersTag.getCompound(key).getDouble("energyLossRate");

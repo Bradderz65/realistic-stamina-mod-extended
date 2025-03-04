@@ -21,6 +21,7 @@ public class NetworkingPackets {
     public static final Identifier PLAYER_SLEEP_C2S_PACKET_ID = new Identifier(RStaminaMod.modid, "player_sleep_c2s_packet");
     public static final Identifier RESET_PLAYERSTATE_C2S_PACKET_ID = new Identifier(RStaminaMod.modid, "reset_playerstate_c2s_packet");
     public static final Identifier RIDING_C2S_PACKET_ID = new Identifier(RStaminaMod.modid, "riding_c2s_packet");
+    public static final Identifier SHOW_SPEED_C2S_PACKET_ID = new Identifier(RStaminaMod.modid, "show_speed_c2s_packet");
 
     //S2C test
     public static final Identifier TEST_S2C_PACKET_ID = new Identifier(RStaminaMod.modid, "test_s2c_packet");
@@ -28,6 +29,7 @@ public class NetworkingPackets {
 
     //S2C
     public static final Identifier SEND_PLAYERSTATE_S2C_PACKET_ID = new Identifier(RStaminaMod.modid, "send_playerstate_s2c_packet");
+    public static final Identifier SEND_SHOW_SPEED_S2C_PACKET_ID = new Identifier(RStaminaMod.modid, "send_show_speed_s2c_packet");
 
     public static void registerC2SPackets() {
         ServerPlayNetworking.registerGlobalReceiver(TEST_PACKET_ID, TestC2SPacket::receive);
@@ -40,6 +42,7 @@ public class NetworkingPackets {
         ServerPlayNetworking.registerGlobalReceiver(PLAYER_SLEEP_C2S_PACKET_ID, PlayerSleepC2SPacket::receive);
         ServerPlayNetworking.registerGlobalReceiver(RESET_PLAYERSTATE_C2S_PACKET_ID, ResetPlayerStateC2SPacket::receive);
         ServerPlayNetworking.registerGlobalReceiver(RIDING_C2S_PACKET_ID, RidingC2SPacket::receive);
+        ServerPlayNetworking.registerGlobalReceiver(SHOW_SPEED_C2S_PACKET_ID, ShowSpeedC2SPacket::receive);
     }
 
     public static void registerS2CPackets() {
@@ -68,13 +71,24 @@ public class NetworkingPackets {
             double maxStamina = buf.readDouble();
             double energy = buf.readDouble();
             double totalStamina = buf.readDouble();
+            double speedMultiplier = buf.readDouble();
             client.execute(() -> {
 
                 RStaminaClient.clientStoredStamina = stamina;
                 RStaminaClient.clientStoredMaxStamina = maxStamina;
                 RStaminaClient.clientStoredEnergy = energy;
                 RStaminaClient.clientStoredTotalStamina = totalStamina;
+                RStaminaClient.clientStoredSpeedMultiplier = speedMultiplier;
 
+            });
+        });
+
+        // Register handler for showing speed multiplier
+        ClientPlayNetworking.registerGlobalReceiver(SEND_SHOW_SPEED_S2C_PACKET_ID, (client, handler, buf, responseSender) -> {
+            int durationTicks = buf.readInt();
+            client.execute(() -> {
+                // Set the timer to show speed multiplier
+                RStaminaClient.showSpeedMultiplierTicks = durationTicks;
             });
         });
 
