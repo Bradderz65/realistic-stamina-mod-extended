@@ -2,12 +2,36 @@
 
 ## Version 1.4.4.0
 
-### Changes
-- Performed clean build and code optimization
-- Fixed compatibility issues with latest Minecraft version
+### New Features
+- Enhanced speed-based energy drain system
+  - Energy drain now scales with movement speed
+  - Configurable maximum drain multiplier
+  - Speed multiplier affects energy consumption
+- Improved walking stamina mechanics
+  - Added walking stamina regeneration options
+  - Configurable regeneration rates while walking
+  - Better balance between movement and regeneration
+- Added configurable mining fatigue cooldown
+- Added detailed configuration options for all systems
+
+### Improvements
+- Reorganized configuration file with clear categories
+- Enhanced stamina management system
+- Added comprehensive comments to all configuration options
 - Improved performance and stability
-- Added speed-based energy drain system
-- Enhanced walking stamina regeneration
+- Fixed compatibility issues with latest Minecraft version
+- Performed clean build and code optimization
+
+### Configuration Updates
+- Added speed-based energy drain settings:
+  - `speedBasedEnergyDrain` (default: true)
+  - `maxSpeedEnergyDrainMultiplier` (default: 2.0)
+  - `speedMultiplierEnergyDrainFactor` (default: 2.0)
+- Added walking regeneration settings:
+  - `enableWalkingStaminaRegen` (default: true)
+  - `walkingStaminaRegenMultiplier` (default: 3.0)
+- Enhanced fitness system configuration
+- Improved exhaustion system settings
 
 ## Version 1.4.3.0
 
