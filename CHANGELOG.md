@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 1.4.4.0
+
+### Changes
+- Performed clean build and code optimization
+- Fixed compatibility issues with latest Minecraft version
+- Improved performance and stability
+- Added speed-based energy drain system
+- Enhanced walking stamina regeneration
+
 ## Version 1.4.3.0
 
 ### New Features
