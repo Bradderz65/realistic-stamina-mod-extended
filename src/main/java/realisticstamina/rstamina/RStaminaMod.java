@@ -33,7 +33,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 public class RStaminaMod implements ModInitializer {
 
-	public static final String rStaminaModVersion = "1.4.4.0";
+	public static final String rStaminaModVersion = "1.4.4.1";
 	public static final String modid = "rstamina";
 	public static final Logger LOGGER = LoggerFactory.getLogger(modid);
 
