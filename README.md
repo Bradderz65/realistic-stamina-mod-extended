@@ -10,6 +10,9 @@ This extended version adds the following features to the original mod:
 - Improved jump detection logic
 - Added mining fatigue effect
 - Speed multiplier system that links max stamina to sprint speed
+- Mining stamina gain system (gain max stamina by mining blocks)
+- Modern, minimal UI for stamina and energy display
+- Thread safety improvements for multiplayer stability
 - Various optimizations and improvements
 
 ### Speed Multiplier System
@@ -17,6 +20,25 @@ This extended version adds the following features to the original mod:
 - Speed increases gradually as max stamina increases through the fitness system
 - Use the `/showspeed` command to see your current speed multiplier for 30 seconds
 - Can be disabled in the configuration if desired
+
+### Mining Stamina Gain System
+- Gain permanent max stamina by mining blocks
+- Progress tracked per player
+- Configurable number of blocks required and amount of stamina gained
+- Can be disabled in the configuration
+
+### Modern UI
+- Clean, minimal progress bars for stamina and energy
+- Percentage values displayed inside the bars
+- Color-coded based on current levels (green/yellow/red for stamina, blue for energy)
+- Shows decimal precision for energy values
+- Hover functionality to display additional information
+- Smooth animations when values change
+
+### Multiplayer Improvements
+- Thread-safe implementation for better stability in multiplayer
+- Fixed concurrent modification exceptions
+- Better null safety and error handling
 
 ## Credits
 - Original mod by [sparkierkan7](https://modrinth.com/user/sparkierkan7)
@@ -46,6 +68,13 @@ The mod includes all original configuration options plus new settings for:
 - Speed multiplier settings:
   - `maxSpeedMultiplier`: Maximum speed multiplier at max stamina (default: 2.0)
   - `enableSpeedMultiplier`: Enable/disable the speed multiplier feature (default: true)
+- Mining stamina gain settings:
+  - `enableMiningStaminaGain`: Enable/disable mining stamina gain (default: false)
+  - `miningBlocksPerStaminaGain`: Number of blocks to mine for stamina gain (default: 100)
+  - `miningStaminaGainAmount`: Amount of max stamina gained (default: 1.0)
+- HUD settings:
+  - `hudX`: X coordinate of stamina and energy HUD (default: 10)
+  - `hudY`: Y coordinate of stamina and energy HUD (default: 25)
 
 ## Commands
 - `/showspeed`: Shows your current speed multiplier for 30 seconds (available to all players)
@@ -56,4 +85,20 @@ The mod includes all original configuration options plus new settings for:
 
 ## Links
 - [Original Mod on Modrinth](https://modrinth.com/mod/realistic-stamina)
-- [Modified Version Source Code](https://github.com/Bradderz65/realistic-stamina-mod)
+- [Modified Version Source Code](https://github.com/Bradderz65/realistic-stamina-mod-extended)
+
+## Changelog
+
+### Version 1.4.4.1
+- Added modern, minimal UI with progress bars and percentage display
+- Added mining stamina gain system
+- Fixed thread safety issues for improved multiplayer stability
+- Added smooth animations to UI elements
+- Added hover functionality to display detailed information
+
+### Version 1.4.4.0
+- Added speed-based energy system
+- Improved walking mechanics
+- Added speed multiplier feature
+- Added mining fatigue effect
+- Various optimizations and bug fixes
