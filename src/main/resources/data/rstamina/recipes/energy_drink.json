@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "   ",
+    "BBB",
+    "SHS"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:glow_berries"
+    },
+    "S": {
+      "item": "minecraft:sugar"
+    },
+    "H": {
+      "item": "minecraft:honey_bottle"
+    }
+  },
+  "result": {
+
+    "item": "rstamina:energy_drink",
+    "count": 1
+
+  }
+}
