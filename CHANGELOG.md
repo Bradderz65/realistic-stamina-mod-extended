@@ -1,5 +1,29 @@
 # Changelog
 
+## Version 1.5.0
+
+### New Features
+- **HUD Style Configuration:** Added a new option (`hudStyle`) to choose between `DETAILED` (bars and text values) and `MINIMAL` (bars only) HUD.
+- **HUD Scale Configuration:** Added a new option (`hudScale`) to adjust the overall size of the stamina and energy HUD.
+
+### Improvements & Refactoring
+- **HUD Rendering:**
+    - Bars now have sharp corners instead of rounded ones.
+    - Text values are now displayed next to the bars (if `DETAILED` HUD style is selected) instead of inside them.
+    - Removed mouse hover functionality for showing detailed values; details are now part of the `DETAILED` style.
+    - Speed multiplier text is now scaled and centered below the bars.
+- **Client-Side Logic:**
+    - Refactored client tick handling in `RStaminaClient.java` for better organization and added null checks to prevent potential errors.
+- **Command Registration:**
+    - Refactored server-side command registration in `RStaminaMod.java` using a helper method for conciseness, affecting commands like `setStaminaLossRate`, `setStaminaGainRate`, etc.
+- **Minor Code Optimizations:**
+    - Added an early exit in the block-breaking efficiency enchantment check.
+    - Minor refactor in `RStaminaPlayerState.updateMaxStamina()`.
+
+### Configuration Updates
+- Added `hudStyle` (enum: `DETAILED`, `MINIMAL`, default: `DETAILED`) to `RStaminaConfig.java`.
+- Added `hudScale` (double, default: `1.0`) to `RStaminaConfig.java`.
+
 ## Version 1.4.4.0
 
 ### New Features

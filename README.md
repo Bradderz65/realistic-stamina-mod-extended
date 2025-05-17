@@ -28,12 +28,14 @@ This extended version adds the following features to the original mod:
 - Can be disabled in the configuration
 
 ### Modern UI
-- Clean, minimal progress bars for stamina and energy
-- Percentage values displayed inside the bars
-- Color-coded based on current levels (green/yellow/red for stamina, blue for energy)
-- Shows decimal precision for energy values
-- Hover functionality to display additional information
-- Smooth animations when values change
+- Clean, minimal progress bars for stamina and energy.
+- **Two HUD Styles:**
+    - `DETAILED`: Shows bars with numeric values (e.g., "50/100") displayed next to them.
+    - `MINIMAL`: Shows only the bars for a less intrusive display.
+- **Scalable HUD:** The overall size of the HUD can be adjusted using the `hudScale` config option.
+- Bars are color-coded based on current levels (stamina: green/yellow/red, energy: blue).
+- Speed multiplier is displayed below the bars when active (e.g., via `/showspeed` command).
+- Smooth animations when values change.
 
 ### Multiplayer Improvements
 - Thread-safe implementation for better stability in multiplayer
@@ -75,6 +77,8 @@ The mod includes all original configuration options plus new settings for:
 - HUD settings:
   - `hudX`: X coordinate of stamina and energy HUD (default: 10)
   - `hudY`: Y coordinate of stamina and energy HUD (default: 25)
+  - `hudStyle`: Style of the HUD (`DETAILED` or `MINIMAL`, default: `DETAILED`)
+  - `hudScale`: Overall scale of the HUD (double, default: 1.0)
 
 ## Commands
 - `/showspeed`: Shows your current speed multiplier for 30 seconds (available to all players)
@@ -86,19 +90,3 @@ The mod includes all original configuration options plus new settings for:
 ## Links
 - [Original Mod on Modrinth](https://modrinth.com/mod/realistic-stamina)
 - [Modified Version Source Code](https://github.com/Bradderz65/realistic-stamina-mod-extended)
-
-## Changelog
-
-### Version 1.4.4.1
-- Added modern, minimal UI with progress bars and percentage display
-- Added mining stamina gain system
-- Fixed thread safety issues for improved multiplayer stability
-- Added smooth animations to UI elements
-- Added hover functionality to display detailed information
-
-### Version 1.4.4.0
-- Added speed-based energy system
-- Improved walking mechanics
-- Added speed multiplier feature
-- Added mining fatigue effect
-- Various optimizations and bug fixes
