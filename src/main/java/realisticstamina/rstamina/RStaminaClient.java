@@ -43,51 +43,10 @@ public class RStaminaClient implements ClientModInitializer {
 
         //tick
         ClientTickEvents.START_CLIENT_TICK.register((client) -> {
-            if (client.world != null) {
-                if (client.world.isClient()) {
-                    if (client.isInSingleplayer()) {
-                        if (!client.isPaused()) {
-
-                            if (clientStoredStamina < clientStoredMaxStamina) {
-                                showingStaminaTicks = 20;
-                            } else if (clientStoredStamina == clientStoredMaxStamina && showingStaminaTicks > 0) {
-                                showingStaminaTicks -= 1;
-                            }
-
-                            // Decrement speed multiplier display timer if active
-                            if (showSpeedMultiplierTicks > 0) {
-                                showSpeedMultiplierTicks -= 1;
-                            }
-
-                            ClientPlayNetworking.send(NetworkingPackets.UPDATE_STAMINA_C2S_PACKET_ID, PacketByteBufs.create());
-                            if (client.player.getVehicle() != null) {
-                                PacketByteBuf buf = PacketByteBufs.create();
-                                buf.writeString(client.player.getVehicle().getName().getString());
-                                buf.writeBoolean(client.player.isRiding());
-                                ClientPlayNetworking.send(NetworkingPackets.RIDING_C2S_PACKET_ID, buf);
-                            }
-                        }
-                    } else {
-
-                        if (clientStoredStamina < clientStoredMaxStamina) {
-                            showingStaminaTicks = 20;
-                        } else if (clientStoredStamina == clientStoredMaxStamina && showingStaminaTicks > 0) {
-                            showingStaminaTicks -= 1;
-                        }
-
-                        // Decrement speed multiplier display timer if active
-                        if (showSpeedMultiplierTicks > 0) {
-                            showSpeedMultiplierTicks -= 1;
-                        }
-
-                        ClientPlayNetworking.send(NetworkingPackets.UPDATE_STAMINA_C2S_PACKET_ID, PacketByteBufs.create());
-                        if (client.player.getVehicle() != null) {
-                            PacketByteBuf buf = PacketByteBufs.create();
-                            buf.writeString(client.player.getVehicle().getName().getString());
-                            buf.writeBoolean(client.player.isRiding());
-                            ClientPlayNetworking.send(NetworkingPackets.RIDING_C2S_PACKET_ID, buf);
-                        }
-                    }
+            if (client.world != null && client.world.isClient() && client.player != null) { // Added client.player != null check
+                boolean canUpdate = client.isInSingleplayer() ? !client.isPaused() : true;
+                if (canUpdate) {
+                    handleClientTickUpdates(client);
                 }
             }
         });
@@ -95,9 +54,9 @@ public class RStaminaClient implements ClientModInitializer {
         EntitySleepEvents.STOP_SLEEPING.register((entity, blockPos) -> {
             if (entity.isPlayer()) {
                 if (entity.getWorld().isClient()) {
-                    MinecraftClient client = MinecraftClient.getInstance();
-                    if (client != null) {
-                        if (Objects.equals(entity.getName().getString(), client.player.getName().getString())) {
+                    MinecraftClient mcClient = MinecraftClient.getInstance(); // Renamed to avoid conflict
+                    if (mcClient != null && mcClient.player != null) { // Added mcClient.player != null check
+                        if (Objects.equals(entity.getName().getString(), mcClient.player.getName().getString())) {
                             send(NetworkingPackets.PLAYER_SLEEP_C2S_PACKET_ID, PacketByteBufs.create());
                         }
                     }
@@ -105,6 +64,27 @@ public class RStaminaClient implements ClientModInitializer {
             }
         });
 
+    }
+
+    private static void handleClientTickUpdates(MinecraftClient client) {
+        if (clientStoredStamina < clientStoredMaxStamina) {
+            showingStaminaTicks = 20;
+        } else if (clientStoredStamina == clientStoredMaxStamina && showingStaminaTicks > 0) {
+            showingStaminaTicks -= 1;
+        }
+
+        // Decrement speed multiplier display timer if active
+        if (showSpeedMultiplierTicks > 0) {
+            showSpeedMultiplierTicks -= 1;
+        }
+
+        ClientPlayNetworking.send(NetworkingPackets.UPDATE_STAMINA_C2S_PACKET_ID, PacketByteBufs.create());
+        if (client.player != null && client.player.getVehicle() != null) { // Ensured client.player is not null before getVehicle()
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeString(client.player.getVehicle().getName().getString());
+            buf.writeBoolean(client.player.isRiding());
+            ClientPlayNetworking.send(NetworkingPackets.RIDING_C2S_PACKET_ID, buf);
+        }
     }
 
 }

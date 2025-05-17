@@ -6,6 +6,15 @@ import me.lortseam.completeconfig.data.ConfigOptions;
 
 public class RStaminaConfig extends Config {
 
+    // ===== HUD STYLE (New Category) =====
+    public enum HudStyle {
+        DETAILED, // Shows bars and text values
+        MINIMAL   // Shows only bars (and speed multiplier when active)
+    }
+
+    @ConfigEntry(comment = "Choose the style of the Stamina and Energy HUD. (Default: DETAILED)")
+    public HudStyle hudStyle = HudStyle.DETAILED;
+
     // ===== GENERAL STAMINA SETTINGS =====
     @ConfigEntry(comment = "Maximum base stamina of players. (Default: 64.0)")
     public double totalStamina = 64.0;
@@ -116,6 +125,9 @@ public class RStaminaConfig extends Config {
     
     @ConfigEntry(comment = "Y coordinate of stamina and energy HUD. 0 is top of the screen. (Default: 25)")
     public int hudY = 25;
+
+    @ConfigEntry(comment = "Overall scale of the stamina and energy HUD. 1.0 is default size. (Default: 1.0)")
+    public double hudScale = 1.0;
 
     // ===== MINING STAMINA GAIN SETTINGS =====
     @ConfigEntry(comment = "Enable gaining max stamina by mining blocks. (Default: false)")

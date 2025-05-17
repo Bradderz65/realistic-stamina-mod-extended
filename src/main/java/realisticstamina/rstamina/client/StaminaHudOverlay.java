@@ -13,9 +13,9 @@ public class StaminaHudOverlay implements HudRenderCallback {
 
     // Bar dimensions
     private static final int BAR_WIDTH = 72;
-    private static final int BAR_HEIGHT = 8;
+    private static final int BAR_HEIGHT = 4;
     private static final int SPACING = 3;
-    private static final int CORNER_RADIUS = 2;
+    private static final int CORNER_RADIUS = 0;
     
     // Store previous values for smooth animation
     private static double lastStaminaPercentage = 1.0;
@@ -26,8 +26,9 @@ public class StaminaHudOverlay implements HudRenderCallback {
 
     @Override
     public void onHudRender(DrawContext drawContext, float tickDelta) {
-        int x = RStaminaMod.config.hudX;
-        int y = RStaminaMod.config.hudY;
+        int hudAnchorX = RStaminaMod.config.hudX;
+        int hudAnchorY = RStaminaMod.config.hudY;
+        float globalScale = (float) RStaminaMod.config.hudScale;
 
         MinecraftClient client = MinecraftClient.getInstance();
 
@@ -36,7 +37,16 @@ public class StaminaHudOverlay implements HudRenderCallback {
             RenderSystem.enableBlend();
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
 
+            drawContext.getMatrices().push();
+            drawContext.getMatrices().translate(hudAnchorX, hudAnchorY, 0);
+            drawContext.getMatrices().scale(globalScale, globalScale, 1.0f);
+
+            // All drawing from now on is relative to (0,0) in the scaled matrix
+            int x = 0; 
+            int y = 0;
+
             TextRenderer textRenderer = client.textRenderer;
+            float textScale = 0.75f; // Defined here for broader scope
             
             // Calculate current values
             double stamina = RStaminaClient.clientStoredStamina;
@@ -61,35 +71,22 @@ public class StaminaHudOverlay implements HudRenderCallback {
                 staminaColor = 0xFFFF5959; // Light red
             }
             
-            // Draw rounded stamina bar background
-            drawRoundedRect(drawContext, x, y, x + BAR_WIDTH, y + BAR_HEIGHT, CORNER_RADIUS, 0x80000000);
+            // Draw stamina bar background
+            drawFilledRect(drawContext, x, y, x + BAR_WIDTH, y + BAR_HEIGHT, 0x80000000);
             
             // Draw filled stamina bar
             int fillWidth = (int) (BAR_WIDTH * lastStaminaPercentage);
             if (fillWidth > 0) {
-                drawRoundedRect(drawContext, x, y, x + fillWidth, y + BAR_HEIGHT, CORNER_RADIUS, staminaColor);
-            }
-            
-            // Draw percentage inside the stamina bar
-            String staminaPercentText = String.format("%d%% (%.0f)", (int)(lastStaminaPercentage * 100), maxStamina);
-            int textWidth = textRenderer.getWidth(staminaPercentText);
-            int textX = x + (BAR_WIDTH - textWidth) / 2;
-            int textY = y + (BAR_HEIGHT - 7) / 2; // Center text vertically
-            
-            // Only hide the percentage if the bar is completely empty
-            if (fillWidth > 0) {
-                // Use a shadow for better visibility
-                drawContext.drawText(textRenderer, staminaPercentText, textX + 1, textY + 1, 0xFF000000, false);
-                drawContext.drawText(textRenderer, staminaPercentText, textX, textY, 0xFFFFFFFF, false);
+                drawFilledRect(drawContext, x, y, x + fillWidth, y + BAR_HEIGHT, staminaColor);
             }
             
             // ----- DRAW ENERGY BAR -----
             
             // Draw energy bar below stamina bar
-            int energyY = y + BAR_HEIGHT + SPACING;
+            int energyBarY = y + BAR_HEIGHT + SPACING;
             
             // Draw energy bar background
-            drawRoundedRect(drawContext, x, energyY, x + BAR_WIDTH, energyY + BAR_HEIGHT, CORNER_RADIUS, 0x80000000);
+            drawFilledRect(drawContext, x, energyBarY, x + BAR_WIDTH, energyBarY + BAR_HEIGHT, 0x80000000);
             
             // Determine energy bar color
             int energyColor = 0xFF5B9BFF; // Light blue
@@ -97,59 +94,61 @@ public class StaminaHudOverlay implements HudRenderCallback {
             // Draw filled energy bar
             fillWidth = (int) (BAR_WIDTH * lastEnergyPercentage);
             if (fillWidth > 0) {
-                drawRoundedRect(drawContext, x, energyY, x + fillWidth, energyY + BAR_HEIGHT, CORNER_RADIUS, energyColor);
+                drawFilledRect(drawContext, x, energyBarY, x + fillWidth, energyBarY + BAR_HEIGHT, energyColor);
             }
             
-            // Draw percentage inside the energy bar
-            String energyPercentText = String.format("%.1f%%", energy);
-            textWidth = textRenderer.getWidth(energyPercentText);
-            textX = x + (BAR_WIDTH - textWidth) / 2;
-            textY = energyY + (BAR_HEIGHT - 7) / 2; // Center text vertically
-            
-            // Only hide the percentage if the bar is completely empty
-            if (fillWidth > 0) {
-                // Use a shadow for better visibility
-                drawContext.drawText(textRenderer, energyPercentText, textX + 1, textY + 1, 0xFF000000, false);
-                drawContext.drawText(textRenderer, energyPercentText, textX, textY, 0xFFFFFFFF, false);
-            }
-            
-            // ----- SHOW DETAILED VALUES WHEN HOVERING -----
-            
-            // Get mouse position
-            int mouseX = (int)(client.mouse.getX() * client.getWindow().getScaledWidth() / client.getWindow().getWidth());
-            int mouseY = (int)(client.mouse.getY() * client.getWindow().getScaledHeight() / client.getWindow().getHeight());
-            
-            // Check if mouse is hovering over either bar
-            boolean hoveringOverBars = mouseX >= x && mouseX <= x + BAR_WIDTH && 
-                                      mouseY >= y && mouseY <= energyY + BAR_HEIGHT;
-                                      
-            if (hoveringOverBars) {
-                // Show numeric values with small font when hovering
+            // ----- TEXT VALUES (Conditional based on HUD Style) -----
+            if (RStaminaMod.config.hudStyle == realisticstamina.rstamina.RStaminaConfig.HudStyle.DETAILED) {
+                int textX = BAR_WIDTH + SPACING; // Position relative to bar end
+
+                // Calculate Y positions for vertically centered scaled text
+                float scaledTextHeight = textRenderer.fontHeight * textScale;
+                int staminaTextY = (int) (y + (BAR_HEIGHT - scaledTextHeight) / 2.0f);
+                int energyTextY = (int) (energyBarY + (BAR_HEIGHT - scaledTextHeight) / 2.0f);
+
+                // Stamina Value
                 String staminaValue = String.format("%.0f/%.0f", stamina, maxStamina);
-                
-                drawContext.drawTextWithShadow(textRenderer, 
-                                              staminaValue, 
-                                              x + BAR_WIDTH + 4, 
-                                              y, 
-                                              staminaColor);
+                drawContext.getMatrices().push();
+                drawContext.getMatrices().translate(textX, staminaTextY, 0);
+                drawContext.getMatrices().scale(textScale, textScale, 1.0f);
+                drawContext.drawTextWithShadow(textRenderer, staminaValue, 0, 0, staminaColor);
+                drawContext.getMatrices().pop(); // Pops the text-specific matrix
+
+                // Energy Value (simplified format)
+                String energyValue = String.format("%.0f", energy);
+                drawContext.getMatrices().push();
+                drawContext.getMatrices().translate(textX, energyTextY, 0);
+                drawContext.getMatrices().scale(textScale, textScale, 1.0f); // Apply local text scale
+                drawContext.drawTextWithShadow(textRenderer, energyValue, 0, 0, energyColor);
+                drawContext.getMatrices().pop(); // Pops the text-specific matrix
             }
             
             // ----- DISPLAY SPEED MULTIPLIER -----
             
             // Only display speed multiplier when showSpeedMultiplierTicks is active
             if (RStaminaClient.showSpeedMultiplierTicks > 0) {
-                // Calculate alpha for speed display based on remaining time
                 float speedAlpha = Math.min(1.0f, RStaminaClient.showSpeedMultiplierTicks / 20.0f);
                 
                 RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, speedAlpha);
                 // Only show speed if it's greater than 1.0
                 if (RStaminaClient.clientStoredSpeedMultiplier > 1.01) {
                     String speedText = String.format("×%.1f", RStaminaClient.clientStoredSpeedMultiplier);
-                    int speedX = x + 4;
-                    int speedY = energyY + BAR_HEIGHT + SPACING;
-                    drawContext.drawTextWithShadow(textRenderer, speedText, speedX, speedY, 0xFF59FFFF);
+                    
+                    // Calculate Y position for speed text (below energy bar with a bit more spacing)
+                    int speedY = energyBarY + BAR_HEIGHT + SPACING + 2; // Added 2px more spacing
+
+                    drawContext.getMatrices().push();
+                    // Center the text horizontally under the bars
+                    float scaledTextWidth = textRenderer.getWidth(speedText) * textScale;
+                    float centeredTextX = x + (BAR_WIDTH - scaledTextWidth) / 2.0f;
+                    drawContext.getMatrices().translate(centeredTextX, speedY, 0);
+                    drawContext.getMatrices().scale(textScale, textScale, 1.0f);
+                    drawContext.drawTextWithShadow(textRenderer, speedText, 0, 0, 0xFF59FFFF); // Cyan-ish color
+                    drawContext.getMatrices().pop();
                 }
             }
+
+            drawContext.getMatrices().pop(); // Pops the global scale matrix
 
             RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
             RenderSystem.disableBlend();
@@ -157,36 +156,9 @@ public class StaminaHudOverlay implements HudRenderCallback {
     }
     
     /**
-     * Draws a rectangle with rounded corners
+     * Draws a filled rectangle.
      */
-    private void drawRoundedRect(DrawContext drawContext, int left, int top, int right, int bottom, int radius, int color) {
-        // Main rectangle (excluding corners)
-        drawContext.fill(left + radius, top, right - radius, bottom, color);
-        drawContext.fill(left, top + radius, right, bottom - radius, color);
-        
-        // Draw corners
-        fillCircleQuarter(drawContext, left + radius, top + radius, radius, 0, color);
-        fillCircleQuarter(drawContext, right - radius, top + radius, radius, 1, color);
-        fillCircleQuarter(drawContext, right - radius, bottom - radius, radius, 2, color);
-        fillCircleQuarter(drawContext, left + radius, bottom - radius, radius, 3, color);
-    }
-    
-    /**
-     * Draws a quarter of a circle
-     * @param quadrant 0=top-left, 1=top-right, 2=bottom-right, 3=bottom-left
-     */
-    private void fillCircleQuarter(DrawContext drawContext, int centerX, int centerY, int radius, int quadrant, int color) {
-        for (int x = 0; x <= radius; x++) {
-            for (int y = 0; y <= radius; y++) {
-                // Check if point is inside circle
-                if (x*x + y*y <= radius*radius) {
-                    // Adjust coordinates based on quadrant
-                    int drawX = centerX + (quadrant == 1 || quadrant == 2 ? x : -x);
-                    int drawY = centerY + (quadrant == 2 || quadrant == 3 ? y : -y);
-                    
-                    drawContext.fill(drawX, drawY, drawX + 1, drawY + 1, color);
-                }
-            }
-        }
+    private void drawFilledRect(DrawContext drawContext, int left, int top, int right, int bottom, int color) {
+        drawContext.fill(left, top, right, bottom, color);
     }
 }

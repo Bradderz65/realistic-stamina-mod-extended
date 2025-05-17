@@ -63,8 +63,7 @@ public class RStaminaPlayerState {
     
     // Update max stamina based on current energy
     public void updateMaxStamina() {
-        totalStamina = getTotalStamina();
-        maxStamina = totalStamina * (energy / 100.0);
+        maxStamina = getTotalStamina() * (energy / 100.0);
     }
     
     // Set a custom total stamina value

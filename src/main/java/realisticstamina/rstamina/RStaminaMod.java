@@ -99,6 +99,7 @@ public class RStaminaMod implements ModInitializer {
 			for (int i = 0; i < mainStack.getEnchantments().size(); i++) {
 				if (Objects.equals(mainStack.getEnchantments().getCompound(i).getString("id"), "minecraft:efficiency")) {
 					hasEfficiency = true;
+					break; // Exit loop once efficiency is found
 				}
 			}
 			if (!player.isCreative() && !hasEfficiency && config.breakingBlocksUsesStamina) {
@@ -208,113 +209,69 @@ public class RStaminaMod implements ModInitializer {
 									return 1;
 								}))));
 
-		//setStaminaLossRate
-		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(literal("setStaminaLossRate").requires(source -> source.hasPermissionLevel(4))
-				.then(argument("value", DoubleArgumentType.doubleArg())
-						.then(argument("player", EntityArgumentType.player())
-								.executes(context -> {
+		// Register commands using the helper method
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			registerPlayerStateDoubleSetterCommand(dispatcher, "setStaminaLossRate", "stamina loss rate", (ps, val) -> ps.staminaLossRate = val);
+			registerPlayerStateDoubleSetterCommand(dispatcher, "setStaminaGainRate", "stamina gain rate", (ps, val) -> ps.staminaGainRate = val);
+			registerPlayerStateDoubleSetterCommand(dispatcher, "setEnergyLossRate", "energy loss rate", (ps, val) -> ps.energyLossRate = val);
+			registerPlayerStateDoubleSetterCommand(dispatcher, "setEnergyGainRate", "energy gain rate", (ps, val) -> ps.energyGainRate = val);
 
-									ServerState serverState = ServerState.getServerState(EntityArgumentType.getPlayer(context, "player").getWorld().getServer());
-									RStaminaPlayerState playerState = ServerState.getPlayerState(EntityArgumentType.getPlayer(context, "player"));
-
-									playerState.staminaLossRate = DoubleArgumentType.getDouble(context, "value");
-									playerState.edited = true;
-									serverState.markDirty();
-
-									context.getSource().sendMessage(Text.literal("Set " + EntityArgumentType.getPlayer(context, "player").getName().getString() + "'s stamina loss rate to " + DoubleArgumentType.getDouble(context, "value")));
-
-									return 1;
-								})))));
-
-		// Register showspeed command (available to all players)
-		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(literal("showspeed")
-				.executes(context -> {
-					ServerPlayerEntity player = context.getSource().getPlayer();
-					if (player != null) {
-						// Check if speed multiplier feature is enabled
-						if (RStaminaMod.config.enableSpeedMultiplier) {
-							// Get the player's state
-							RStaminaPlayerState playerState = ServerState.getPlayerState(player);
-							
-							// Calculate speed multiplier based on max stamina
-							double baseStamina = RStaminaMod.config.totalStamina;
-							double maxStamina = RStaminaMod.config.fitnessStaminaLimit;
-							double currentTotalStamina = playerState.totalStamina;
-							
-							// Calculate a multiplier between 1.0 and maxSpeedMultiplier based on stamina
-							double staminaProgress = Math.min(1.0, Math.max(0.0, (currentTotalStamina - baseStamina) / (maxStamina - baseStamina)));
-							double speedMultiplier = 1.0 + (staminaProgress * (RStaminaMod.config.maxSpeedMultiplier - 1.0));
-							
-							// Send a message to the player
-							player.sendMessage(Text.literal(String.format("§bCurrent speed multiplier: §f%.2fx", speedMultiplier)), false);
-							
-							// Send a packet to the client to show the speed multiplier for 30 seconds (600 ticks)
-							PacketByteBuf sendingData = PacketByteBufs.create();
-							sendingData.writeInt(600); // 30 seconds * 20 ticks per second
-							ServerPlayNetworking.send(player, NetworkingPackets.SEND_SHOW_SPEED_S2C_PACKET_ID, sendingData);
-						} else {
-							// Send a message to the player that the feature is disabled
-							player.sendMessage(Text.literal("§cSpeed multiplier feature is disabled in the configuration."), false);
+			// Register showspeed command (available to all players)
+			dispatcher.register(literal("showspeed")
+					.executes(context -> {
+						ServerPlayerEntity player = context.getSource().getPlayer();
+						if (player != null) {
+							// Check if speed multiplier feature is enabled
+							if (RStaminaMod.config.enableSpeedMultiplier) {
+								// Get the player's state
+								RStaminaPlayerState playerState = ServerState.getPlayerState(player);
+								
+								// Calculate speed multiplier based on max stamina
+								double baseStamina = RStaminaMod.config.totalStamina;
+								double maxStamina = RStaminaMod.config.fitnessStaminaLimit;
+								double currentTotalStamina = playerState.totalStamina;
+								
+								// Calculate a multiplier between 1.0 and maxSpeedMultiplier based on stamina
+								double staminaProgress = Math.min(1.0, Math.max(0.0, (currentTotalStamina - baseStamina) / (maxStamina - baseStamina)));
+								double speedMultiplier = 1.0 + (staminaProgress * (RStaminaMod.config.maxSpeedMultiplier - 1.0));
+								
+								// Send a message to the player
+								player.sendMessage(Text.literal(String.format("§bCurrent speed multiplier: §f%.2fx", speedMultiplier)), false);
+								
+								// Send a packet to the client to show the speed multiplier for 30 seconds (600 ticks)
+								PacketByteBuf sendingData = PacketByteBufs.create();
+								sendingData.writeInt(600); // 30 seconds * 20 ticks per second
+								ServerPlayNetworking.send(player, NetworkingPackets.SEND_SHOW_SPEED_S2C_PACKET_ID, sendingData);
+							} else {
+								// Send a message to the player that the feature is disabled
+								player.sendMessage(Text.literal("§cSpeed multiplier feature is disabled in the configuration."), false);
+							}
 						}
-					}
-					return 1;
-				})));
-
-		//setStaminaGainRate
-		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(literal("setStaminaGainRate").requires(source -> source.hasPermissionLevel(4))
-				.then(argument("value", DoubleArgumentType.doubleArg())
-						.then(argument("player", EntityArgumentType.player())
-								.executes(context -> {
-
-									ServerState serverState = ServerState.getServerState(EntityArgumentType.getPlayer(context, "player").getWorld().getServer());
-									RStaminaPlayerState playerState = ServerState.getPlayerState(EntityArgumentType.getPlayer(context, "player"));
-
-									playerState.staminaGainRate = DoubleArgumentType.getDouble(context, "value");
-									playerState.edited = true;
-									serverState.markDirty();
-
-									context.getSource().sendMessage(Text.literal("Set " + EntityArgumentType.getPlayer(context, "player").getName().getString() + "'s stamina gain rate to " + DoubleArgumentType.getDouble(context, "value")));
-
-									return 1;
-								})))));
-
-		//setEnergyLossRate
-		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(literal("setEnergyLossRate").requires(source -> source.hasPermissionLevel(4))
-				.then(argument("value", DoubleArgumentType.doubleArg())
-						.then(argument("player", EntityArgumentType.player())
-								.executes(context -> {
-
-									ServerState serverState = ServerState.getServerState(EntityArgumentType.getPlayer(context, "player").getWorld().getServer());
-									RStaminaPlayerState playerState = ServerState.getPlayerState(EntityArgumentType.getPlayer(context, "player"));
-
-									playerState.energyLossRate = DoubleArgumentType.getDouble(context, "value");
-									playerState.edited = true;
-									serverState.markDirty();
-
-									context.getSource().sendMessage(Text.literal("Set " + EntityArgumentType.getPlayer(context, "player").getName().getString() + "'s energy loss rate to " + DoubleArgumentType.getDouble(context, "value")));
-
-									return 1;
-								})))));
-
-		//setEnergyGainRate
-		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(literal("setEnergyGainRate").requires(source -> source.hasPermissionLevel(4))
-				.then(argument("value", DoubleArgumentType.doubleArg())
-						.then(argument("player", EntityArgumentType.player())
-								.executes(context -> {
-
-									ServerState serverState = ServerState.getServerState(EntityArgumentType.getPlayer(context, "player").getWorld().getServer());
-									RStaminaPlayerState playerState = ServerState.getPlayerState(EntityArgumentType.getPlayer(context, "player"));
-
-									playerState.energyGainRate = DoubleArgumentType.getDouble(context, "value");
-									playerState.edited = true;
-									serverState.markDirty();
-
-									context.getSource().sendMessage(Text.literal("Set " + EntityArgumentType.getPlayer(context, "player").getName().getString() + "'s energy gain rate to " + DoubleArgumentType.getDouble(context, "value")));
-
-									return 1;
-								})))));
+						return 1;
+					}));
+		});
 	}
-	
+ // Removed erroneous line here
+	private static void registerPlayerStateDoubleSetterCommand(com.mojang.brigadier.CommandDispatcher<net.minecraft.server.command.ServerCommandSource> dispatcher, String commandName, String statDescription, java.util.function.BiConsumer<RStaminaPlayerState, Double> valueSetter) {
+		dispatcher.register(literal(commandName).requires(source -> source.hasPermissionLevel(4))
+				.then(argument("value", DoubleArgumentType.doubleArg())
+						.then(argument("player", EntityArgumentType.player())
+								.executes(context -> {
+									ServerPlayerEntity targetedPlayer = EntityArgumentType.getPlayer(context, "player");
+									ServerState serverState = ServerState.getServerState(targetedPlayer.getWorld().getServer());
+									RStaminaPlayerState playerState = ServerState.getPlayerState(targetedPlayer);
+									double commandValue = DoubleArgumentType.getDouble(context, "value");
+
+									valueSetter.accept(playerState, commandValue);
+									playerState.edited = true;
+									serverState.markDirty();
+
+									context.getSource().sendMessage(Text.literal("Set " + targetedPlayer.getName().getString() + "'s " + statDescription + " to " + commandValue));
+
+									return 1;
+								}))));
+	}
+
 	/**
 	 * Helper method to synchronize player state values with config defaults
 	 * @param playerState The player state to update
