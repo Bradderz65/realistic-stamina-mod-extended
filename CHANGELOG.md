@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## Version 1.6.0 (2025-08-09)
 
 ### New Features
 - **In-Game Configuration:** Added a complete in-game configuration system to adjust mod settings without editing config files.
