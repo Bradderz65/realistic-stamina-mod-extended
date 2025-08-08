@@ -5,6 +5,7 @@ This is an enhanced version of the [Realistic Stamina mod](https://modrinth.com/
 ## New Features & Improvements
 
 This extended version adds the following features to the original mod:
+- **In-Game Configuration** - Full configuration menu accessible from the Mod Menu or via command
 - Configurable jump stamina cost
 - Configurable mining fatigue cooldown
 - Improved jump detection logic
@@ -12,6 +13,7 @@ This extended version adds the following features to the original mod:
 - Speed multiplier system that links max stamina to sprint speed
 - Mining stamina gain system (gain max stamina by mining blocks)
 - Modern, minimal UI for stamina and energy display
+- **Optimized Walking Regeneration** - Fixed slow stamina regeneration when walking
 - Thread safety improvements for multiplayer stability
 - Various optimizations and improvements
 
@@ -26,6 +28,12 @@ This extended version adds the following features to the original mod:
 - Progress tracked per player
 - Configurable number of blocks required and amount of stamina gained
 - Can be disabled in the configuration
+
+### In-Game Configuration
+- Access all mod settings directly in-game through the Mod Menu
+- No need to edit config files manually
+- Real-time updates to settings
+- All features can be toggled and configured through the UI
 
 ### Modern UI
 - Clean, minimal progress bars for stamina and energy.
