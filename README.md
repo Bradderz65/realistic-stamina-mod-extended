@@ -14,6 +14,7 @@ This extended version adds the following features to the original mod:
 - Mining stamina gain system (gain max stamina by mining blocks)
 - Modern, minimal UI for stamina and energy display
 - **Optimized Walking Regeneration** - Fixed slow stamina regeneration when walking
+- **Exhausted Jump Lock** - Exhausted players can no longer jump until they recover
 - Thread safety improvements for multiplayer stability
 - Various optimizations and improvements
 
